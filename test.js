@@ -1,5 +1,5 @@
 const JZZ = require('jzz');
-require('jzz-gui-ocarina')(JZZ);
+require('.')(JZZ);
 
 var oca = new JZZ.gui.Ocarina();
 var w = 200, h = 200;
