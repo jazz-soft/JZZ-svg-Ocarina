@@ -47,6 +47,9 @@
       d = arg.dots[i];
       this.dots.push(new Dot(d[0], d[1], d[2]));
     }
+    this.key = JZZ.MIDI.noteValue(arg.key);
+    if (this.key == undefined) this.key = 60;
+    this.back = arg.back;
     if (arg.at) {
       try {
         svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -67,6 +70,7 @@
           this.at = document;
         }
         this.svg = svg;
+        if (this.back) this.svg.innerHTML = this.back;
         for (i = 0; i < this.dots.length; i++) {
           d = this.dots[i].render();
           if (d) svg.appendChild(d);
@@ -76,6 +80,7 @@
   }
   Ocarina.prototype.dump = function(w, h) {
     var svg = [];
+    if (this.back) svg.push(this.back);
     for (i = 0; i < this.dots.length; i++) svg.push(this.dots[i].dump());
     return svg.join('\n');
   };
