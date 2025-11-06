@@ -39,17 +39,18 @@
   const _dots = [[0, 0, 0.1], [0.5, 0.5, 0.03], [1, 1, 0.05]];
 
   function Ocarina(arg) {
+    var self = new JZZ.Widget();
     var i, d, svg;
     if (!arg) arg = {};
     if (!arg.dots) arg.dots = _dots;
-    this.dots = [];
+    self.dots = [];
     for (i = 0; i < arg.dots.length; i++) {
       d = arg.dots[i];
-      this.dots.push(new Dot(d[0], d[1], d[2]));
+      self.dots.push(new Dot(d[0], d[1], d[2]));
     }
-    this.key = JZZ.MIDI.noteValue(arg.key);
-    if (this.key == undefined) this.key = 60;
-    this.back = arg.back;
+    self.key = JZZ.MIDI.noteValue(arg.key);
+    if (self.key == undefined) self.key = 60;
+    self.back = arg.back;
     if (arg.at) {
       try {
         svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -61,22 +62,32 @@
         svg = undefined;
       }
       if (svg) {
-        if (typeof arg.at == 'string') this.at = document.getElementById(arg.at);
+        if (typeof arg.at == 'string') self.at = document.getElementById(arg.at);
         try {
-          this.at.appendChild(svg);
+          self.at.appendChild(svg);
         }
         catch (e) {
           document.appendChild(svg);
-          this.at = document;
+          self.at = document;
         }
-        this.svg = svg;
-        if (this.back) this.svg.innerHTML = this.back;
-        for (i = 0; i < this.dots.length; i++) {
-          d = this.dots[i].render();
+        self.svg = svg;
+        if (self.back) self.svg.innerHTML = self.back;
+        for (i = 0; i < self.dots.length; i++) {
+          d = self.dots[i].render();
           if (d) svg.appendChild(d);
         }
       }
     }
+    self.chan = arg.chan || 0;
+    self._receive = function(msg) {
+      _emit(msg);
+    }
+    return self;
+  }
+  Ocarina.prototype.set = function(n, a) {
+  }
+  Ocarina.prototype.reset = function() {
+    for (var i = 0; i < this.dots.length; i++) this.dots[i].reset();
   }
   Ocarina.prototype.dump = function(w, h) {
     var svg = [];

@@ -33,6 +33,7 @@ var svg_grid = `<g fill="white" stroke="#ccc" stroke-width="0.01">
 JZZ.synth.Tiny.register('Web Audio');
 var piano = JZZ.input.Kbd({at: 'piano' });
 var ocarina = JZZ.gui.Ocarina({ at: 'ocarina', back: svg_grid });
+piano.connect(ocarina);
 </script>
 
 <p>
