@@ -22,11 +22,11 @@
     this.state = 0;
   }
   Hole.prototype.dump = function() {
-    return '<circle stroke-width="1px" vector-effect="non-scaling-stroke" stroke="currentColor" fill="' + (this.state ? 'currentColor' : 'none') + '" cx="' + this.x + '" cy="' + this.y + '" r="' + this.r + '"/>';
+    return '<circle vector-effect="non-scaling-stroke" ' + (this.state ? '' : 'fill="none" ') + 'cx="' + this.x + '" cy="' + this.y + '" r="' + this.r + '"/>';
   };
   Hole.prototype.render = function(at) {
     if (at) this.at = at;
-    if (this.svg) arguments.removeChild(this.svg);
+    if (this.svg) this.at.removeChild(this.svg);
     this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     this.svg.setAttribute('cx', this.x);
     this.svg.setAttribute('cy', this.y);
@@ -35,7 +35,7 @@
     this.svg.setAttribute('fill', this.state ? 'currentColor' : 'none');
     this.svg.setAttribute('vector-effect', 'non-scaling-stroke');
     this.svg.setAttribute('stroke-width', '1px');
-    at.appendChild(this.svg);
+    this.at.appendChild(this.svg);
   };
   Hole.prototype.set = function(x) {
     if (this.state == x) return;
@@ -43,15 +43,39 @@
     this.render();
   }
 
+  function _chart(n, c) {
+    var i, h;
+    var a = new Array(n).fill(0);
+    for (i = 0; i < c.length; i++) {
+      h = c[i];
+      if (Array.isArray(h)) a[h[0]] = h[1];
+      else a[h] = 1;
+    }
+    return a;
+  }
   function Ocarina(arg) {
     var self = new JZZ.Widget();
-    var i, d, svg;
+    var i, k, a, x, svg;
     if (!arg) arg = {};
     self.holes = [];
     for (i = 0; i < arg.holes.length; i++) {
-      d = arg.holes[i];
-      self.holes.push(new Hole(d[0], d[1], d[2]));
+      x = arg.holes[i];
+      self.holes.push(new Hole(x[0], x[1], x[2]));
     }
+    self.chart = [];
+    for (i = 0; i < arg.chart.length; i++) {
+      x = arg.chart[i];
+      if (!x) {
+        self.chart.push(undefined);
+      }
+      else {
+        a = [];
+        if (Array.isArray(x[0])) for (k = 0; k < x.length; k++) a.push(_chart(self.holes.length, x[k]));
+        else a.push(_chart(self.holes.length, x));
+        self.chart.push(a);
+      }
+    }
+    self.alt = new Array(self.chart.length).fill(0);
     self.key = JZZ.MIDI.noteValue(arg.key);
     if (self.key == undefined) self.key = 60;
     self.back = arg.back;
@@ -81,20 +105,31 @@
     }
     self.chan = arg.chan || 0;
     self._receive = function(msg) {
+      if (msg.getChannel() == self.chan) {
+        if (msg.isNoteOn()) self.set(msg.getNote());
+      }
       self._emit(msg);
     }
     self.dump = function(w, h) {
       var svg = [];
       if (this.back) svg.push(this.back);
-      svg.push('<g>');
+      svg.push('<g vector-effect="non-scaling-stroke" stroke-width="1px" stroke="currentColor" fill="currentColor">');
       for (i = 0; i < this.holes.length; i++) svg.push(this.holes[i].dump());
       svg.push('</g>');
       return svg.join('\n');
     };
     self.set = function(n, a) {
+      n = JZZ.MIDI.noteValue(n) - self.key;
+      if (!self.chart[n]) {
+        self.reset();
+        return;
+      }
+      if (a == parseInt(a) && a >= 0 && a < self.char[n].length) self.alt[n] = a;
+      a = self.chart[n][self.alt[n]];
+      for (n = 0; n < a.length; n++) self.holes[n].set(a[n]);
     };
     self.reset = function() {
-      for (var i = 0; i < this.holes.length; i++) this.holes[i].set(0);
+      for (var i = 0; i < self.holes.length; i++) self.holes[i].set(0);
     };
     return self;
   }
