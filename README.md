@@ -1,2 +1,2 @@
-# JZZ-gui-Ocarina
+# JZZ-svg-Ocarina
 coming soon...

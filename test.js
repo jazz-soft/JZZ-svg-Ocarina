@@ -41,7 +41,7 @@ var chart = [
   [0, 2],                         // C
 ];
 
-var oca = new JZZ.gui.Ocarina({ back: svg_grid, holes: holes, chart: chart });
+var oca = new JZZ.svg.Ocarina({ back: svg_grid, holes: holes, chart: chart });
 var dump = [];
 dump.push('<svg version="1.1" viewBox="0 0 1 1" xmlns="http://www.w3.org/2000/svg">');
 dump.push(oca.dump());

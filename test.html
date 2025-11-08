@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>JZZ.gui.Ocarina test</title>
+<title>JZZ.svg.Ocarina test</title>
 <script src="node_modules/jzz/javascript/JZZ.js"></script>
 <script src="node_modules/jzz-synth-tiny/javascript/JZZ.synth.Tiny.js"></script>
 <script src="node_modules/jzz-input-kbd/javascript/JZZ.input.Kbd.js"></script>
-<script src="javascript/JZZ.gui.Ocarina.js"></script>
+<script src="javascript/JZZ.svg.Ocarina.js"></script>
 <style>
 #ocarina {display:inline-block;width:300px;}
 </style>
 </head>
 
 <body>
-<h1>JZZ.gui.Ocarina test</h1>
+<h1>JZZ.svg.Ocarina test</h1>
 <div><span id=ocarina></span></div>
 <span id=piano></span>
 
@@ -59,7 +59,7 @@ var chart = [
 
 JZZ.synth.Tiny.register('Web Audio');
 var piano = JZZ.input.Kbd({at: 'piano' });
-var ocarina = JZZ.gui.Ocarina({ at: 'ocarina', back: svg_grid, holes: holes, chart: chart });
+var ocarina = JZZ.svg.Ocarina({ at: 'ocarina', back: svg_grid, holes: holes, chart: chart });
 piano.connect(ocarina);
 </script>
 

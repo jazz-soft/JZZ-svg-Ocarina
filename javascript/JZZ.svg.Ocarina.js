@@ -5,15 +5,15 @@
     module.exports = factory;
   }
   else if (typeof define === 'function' && define.amd) {
-    define('JZZ.gui.Ocarina', ['JZZ'], factory);
+    define('JZZ.svg.Ocarina', ['JZZ'], factory);
   }
   else {
     factory(JZZ);
   }
 })(this, function(JZZ) {
 
-  if (!JZZ.gui) JZZ.gui = {};
-  if (JZZ.gui.Ocarina) return;
+  if (!JZZ.svg) JZZ.svg = {};
+  if (JZZ.svg.Ocarina) return;
 
   function Hole(x, y, r, t) {
     this.x = x;
@@ -134,5 +134,5 @@
     return self;
   }
 
-  JZZ.gui.Ocarina = Ocarina;
+  JZZ.svg.Ocarina = Ocarina;
 });
