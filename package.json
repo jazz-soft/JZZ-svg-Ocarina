@@ -8,7 +8,8 @@
   },
   "keywords": [
     "midi",
-    "ocarina"
+    "ocarina",
+    "svg"
   ],
   "author": "jazz-soft (https://jazz-soft.net/)",
   "dependencies": {
