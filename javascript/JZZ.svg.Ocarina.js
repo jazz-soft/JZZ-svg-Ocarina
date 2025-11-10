@@ -22,19 +22,33 @@
     this.state = 0;
   }
   Hole.prototype.dump = function() {
-    return '<circle vector-effect="non-scaling-stroke" ' + (this.state ? '' : 'fill="none" ') + 'cx="' + this.x + '" cy="' + this.y + '" r="' + this.r + '"/>';
+    var d = '<circle vector-effect="non-scaling-stroke" ' + ((this.state & 1) ? '' : 'fill="none" ') + 'cx="' + this.x + '" cy="' + this.y + '" r="' + this.r + '"/>';
+    if (this.state == 2) d += '\n<path d="' + _moon(this) + '" vector-effect="non-scaling-stroke"/>';
+    return d;
   };
   Hole.prototype.render = function(at) {
     if (at) this.at = at;
+    if (!this.at) return;
     if (this.svg) this.at.removeChild(this.svg);
-    this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    this.svg.setAttribute('cx', this.x);
-    this.svg.setAttribute('cy', this.y);
-    this.svg.setAttribute('r', this.r);
-    this.svg.setAttribute('stroke', 'currentColor');
-    this.svg.setAttribute('fill', this.state ? 'currentColor' : 'none');
-    this.svg.setAttribute('vector-effect', 'non-scaling-stroke');
-    this.svg.setAttribute('stroke-width', '1px');
+    this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    svg.setAttribute('cx', this.x);
+    svg.setAttribute('cy', this.y);
+    svg.setAttribute('r', this.r);
+    svg.setAttribute('stroke', 'currentColor');
+    svg.setAttribute('fill', (this.state & 1) ? 'currentColor' : 'none');
+    svg.setAttribute('vector-effect', 'non-scaling-stroke');
+    svg.setAttribute('stroke-width', '1px');
+    this.svg.appendChild(svg);
+    if (this.state == 2) {
+      svg = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      svg.setAttribute('d', _moon(this));
+      svg.setAttribute('fill', 'currentColor');
+      svg.setAttribute('stroke', 'currentColor');
+      svg.setAttribute('vector-effect', 'non-scaling-stroke');
+      svg.setAttribute('stroke-width', '1px');
+      this.svg.appendChild(svg);
+    }
     this.at.appendChild(this.svg);
   };
   Hole.prototype.set = function(x) {
@@ -42,7 +56,9 @@
     this.state = x;
     this.render();
   }
-
+  function _moon(x) {
+    return ['M', x.x, x.y - x.r, 'A', x.r, x.r, 0, 0, 1, x.x, x.y + x.r, 'L', x.x, x.y - x.r].join(' ');
+  }
   function _chart(n, c) {
     var i, h;
     var a = new Array(n).fill(0);
@@ -52,6 +68,23 @@
       else a[h] = 1;
     }
     return a;
+  }
+  function _val_g(x) {
+    var i;
+    if (!Array.isArray(x)) return false;
+    for (i = 0; i < x.length; i++) if (!_val_c(x[i])) return false;
+    return true;
+  }
+  function _val_c(x) {
+    var i, j;
+    if (!Array.isArray(x)) return false;
+    for (i = 0; i < x.length; i++) {
+      if (Array.isArray(x[i])) {
+        for (j = 0; j < x[i].length; j++) if (parseInt(x[i][j]) != x[i][j]) return false;
+      }
+      else if (parseInt(x[i]) != x[i]) return false;
+    }
+    return true;
   }
   function Ocarina(arg) {
     var self = new JZZ.Widget();
@@ -70,14 +103,15 @@
       }
       else {
         a = [];
-        if (Array.isArray(x[0])) for (k = 0; k < x.length; k++) a.push(_chart(self.holes.length, x[k]));
-        else a.push(_chart(self.holes.length, x));
+        if (_val_g(x)) for (k = 0; k < x.length; k++) a.push(_chart(self.holes.length, x[k]));
+        else if (_val_c(x)) a.push(_chart(self.holes.length, x));
+        else console.error('Bad chart data:', x)
         self.chart.push(a);
       }
     }
     self.alt = new Array(self.chart.length).fill(0);
     self.key = JZZ.MIDI.noteValue(arg.key);
-    if (self.key == undefined) self.key = 60;
+    if (self.key == undefined) self.key = 72;
     self.back = arg.back;
     if (arg.at) {
       try {
@@ -130,6 +164,9 @@
     };
     self.reset = function() {
       for (var i = 0; i < self.holes.length; i++) self.holes[i].set(0);
+    };
+    self.range = function() {
+      return [self.key, self.key + self.chart.length - 1];
     };
     return self;
   }

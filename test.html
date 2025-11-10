@@ -13,7 +13,7 @@
 
 <body>
 <h1>JZZ.svg.Ocarina test</h1>
-<div><span id=ocarina></span></div>
+<div><span id=ocarina title="Baroque C-soprano"></span></div>
 <span id=piano></span>
 
 <script>
@@ -53,14 +53,31 @@ var chart = [
   [0, 1, 2, 4, 5, 6],
   [0, 1, 2],                      // A
   [0, 1, 3, 4],
-  [0, 1],                         // B
+  [[0, 1], [0, 2, 3]],            // B
   [0, 2],                         // C
+  [[1, 2], [0]],
+  [2],                            // D
+  [2, 3, 4, 5, 6, 7],
+  [[0, 2], 1, 2, 3, 4, 5],        // E
+  [[0, 2], 1, 2, 3, 4, 6, 7],     // F
+  [[0, 2], 1, 2, 3, 5],
+  [[0, 2], 1, 2, 3],              // G
+  [[0, 2], 1, 2, 4],
+  [[0, 2], 1, 2],                 // A
+  [[0, 2], 1, 2, 4, 5, 6, 7],
+  [[[0, 2], 1, 2, 4, 5], [[0, 2], 1, 5, 6, 7, 8, 9]],
+  [[0, 2], 1, 4, 5],              // C
+  [[0, 2], 1, 3, 4, 5, 8, 9],
+  [[0, 2], 1, 3, 4, 6, 7]         // D
 ];
 
 JZZ.synth.Tiny.register('Web Audio');
-var piano = JZZ.input.Kbd({at: 'piano' });
+var midiout = JZZ().openMidiOut().and(function() { midiout.program(0, 79); });
 var ocarina = JZZ.svg.Ocarina({ at: 'ocarina', back: svg_grid, holes: holes, chart: chart });
+var range = ocarina.range();
+var piano = JZZ.input.Kbd({at: 'piano', from: range[0], to: range[1] });
 piano.connect(ocarina);
+piano.connect(midiout);
 </script>
 
 <p>
