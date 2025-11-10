@@ -4,7 +4,8 @@
   "description": "coming soon...",
   "main": "javascript/JZZ.svg.Ocarina.js",
   "scripts": {
-    "test": "nyc mocha"
+    "test": "nyc mocha",
+    "coverage": "nyc report --reporter=lcov"
   },
   "keywords": [
     "midi",
