@@ -15,7 +15,7 @@
   if (!JZZ.svg) JZZ.svg = {};
   if (JZZ.svg.Ocarina) return;
 
-  function Hole(x, y, r, t) {
+  function Hole(x, y, r) {
     this.x = x;
     this.y = y;
     this.r = r;
@@ -55,7 +55,7 @@
     if (this.state == x) return;
     this.state = x;
     this.render();
-  }
+  };
   function _moon(x) {
     return ['M', x.x, x.y - x.r, 'A', x.r, x.r, 0, 0, 1, x.x, x.y + x.r, 'L', x.x, x.y - x.r].join(' ');
   }
@@ -105,7 +105,7 @@
         a = [];
         if (_val_g(x)) for (k = 0; k < x.length; k++) a.push(_chart(self.holes.length, x[k]));
         else if (_val_c(x)) a.push(_chart(self.holes.length, x));
-        else console.error('Bad chart data:', x)
+        else console.error('Bad chart data:', x);
         self.chart.push(a);
       }
     }
@@ -143,8 +143,8 @@
         if (msg.isNoteOn()) self.set(msg.getNote());
       }
       self._emit(msg);
-    }
-    self.dump = function(w, h) {
+    };
+    self.dump = function() {
       var svg = [];
       if (this.back) svg.push(this.back);
       svg.push('<g vector-effect="non-scaling-stroke" stroke-width="1px" stroke="currentColor" fill="currentColor">');
