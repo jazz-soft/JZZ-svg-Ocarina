@@ -158,7 +158,7 @@
         self.reset();
         return;
       }
-      if (a == parseInt(a) && a >= 0 && a < self.char[n].length) self.alt[n] = a;
+      if (a == parseInt(a) && a >= 0 && a < self.chart[n].length) self.alt[n] = a;
       a = self.chart[n][self.alt[n]];
       for (n = 0; n < a.length; n++) self.holes[n].set(a[n]);
     };

@@ -14,7 +14,7 @@ const _holes = [
   [.49, .793, .011],
   [.515, .807, .01]
 ];
-const _chart = [
+const _baroque = [
   [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], // c
   [0, 1, 2, 3, 4, 5, 6, 7, 8],
   [0, 1, 2, 3, 4, 5, 6, 7],       // D
@@ -45,8 +45,9 @@ const _chart = [
 ];
 
 describe('chart', function() {
-  it('basic', function() {
-    var oca = new JZZ.svg.Ocarina({ holes: _holes, chart: _chart});
-    console.log(oca.chart);
+  it('baroque', function() {
+    var i, j;
+    var oca = new JZZ.svg.Ocarina({ holes: _holes, chart: _baroque});
+    for (i = 0; i < oca.chart.length; i++) for(j = 0; j < oca.chart[i].length; j++) oca.set(i + oca.key, j);
   });
 });
