@@ -58,11 +58,15 @@ var chart = [
 var oca = new JZZ.svg.Ocarina({ back: svg_grid, holes: holes, chart: chart });
 var dump = [];
 dump.push('<svg version="1.1" viewBox="0 0 6 5" xmlns="http://www.w3.org/2000/svg">');
-var r = 0, c = 0, i, j;
+var r = 0, c = 0, i, j, n;
 for (i = 0; i < oca.chart.length; i++) for (j = 0; j < oca.chart[i].length; j++) {
-  oca.set(i + oca.key, j);
+  n = i + oca.key;
+  oca.set(n, j);
+  n = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'][n % 12] + Math.floor(n / 12);
+  if (j) n += ' *';
   dump.push('<g transform="translate(' + c + ' ' + r + ')">');
   dump.push(oca.dump());
+  dump.push('<text x=".05" y=".15" font-size=".12">' + n + '</text>');
   dump.push('</g>');
   c++;
   if (c > 5) { r++; c = 0; }
