@@ -95,6 +95,11 @@
       x = arg.holes[i];
       self.holes.push(new Hole(x[0], x[1], x[2]));
     }
+    self.blow = [];
+    if (arg.blow) for (i = 0; i < arg.blow.length; i++) {
+      x = arg.blow[i];
+      self.blow.push(new Hole(x[0], x[1], x[2]));
+    }
     self.chart = [];
     for (i = 0; i < arg.chart.length; i++) {
       x = arg.chart[i];
@@ -161,6 +166,10 @@
       if (a == parseInt(a) && a >= 0 && a < self.chart[n].length) self.alt[n] = a;
       a = self.chart[n][self.alt[n]];
       for (n = 0; n < a.length; n++) self.holes[n].set(a[n]);
+    };
+    self.on = function() {
+    };
+    self.off = function() {
     };
     self.reset = function() {
       for (var i = 0; i < self.holes.length; i++) self.holes[i].set(0);
