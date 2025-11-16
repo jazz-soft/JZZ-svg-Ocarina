@@ -31,24 +31,8 @@
     if (!this.at) return;
     if (this.svg) this.at.removeChild(this.svg);
     this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    svg.setAttribute('cx', this.x);
-    svg.setAttribute('cy', this.y);
-    svg.setAttribute('r', this.r);
-    svg.setAttribute('stroke', 'currentColor');
-    svg.setAttribute('fill', (this.state & 1) ? 'currentColor' : 'none');
-    svg.setAttribute('vector-effect', 'non-scaling-stroke');
-    svg.setAttribute('stroke-width', '1px');
-    this.svg.appendChild(svg);
-    if (this.state == 2) {
-      svg = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      svg.setAttribute('d', _moon(this));
-      svg.setAttribute('fill', 'currentColor');
-      svg.setAttribute('stroke', 'currentColor');
-      svg.setAttribute('vector-effect', 'non-scaling-stroke');
-      svg.setAttribute('stroke-width', '1px');
-      this.svg.appendChild(svg);
-    }
+    this.svg.appendChild(_circle(this.x, this.y, this.r, (this.state & 1) ? 'currentColor' : 'none'));
+    if (this.state == 2) this.svg.appendChild(_path(_moon(this)));
     this.at.appendChild(this.svg);
   };
   Hole.prototype.set = function(x) {
@@ -56,6 +40,50 @@
     this.state = x;
     this.render();
   };
+  function Blow(x, y, r) {
+    this.x = x;
+    this.y = y;
+    this.r = r;
+    this.state = 0;
+  }
+  Blow.prototype.dump = function() {
+    return this.state ? '<circle vector-effect="non-scaling-stroke" cx="' + this.x + '" cy="' + this.y + '" r="' + this.r + '"/>' : '';
+  };
+  Blow.prototype.render = function(at) {
+    if (at) this.at = at;
+    if (!this.at) return;
+    if (this.svg) this.at.removeChild(this.svg);
+    if (this.state) {
+      this.svg = _circle(this.x, this.y, this.r, 'currentColor');
+      this.at.appendChild(this.svg);
+    }
+    else this.svg = undefined;
+  };
+  Blow.prototype.set = function(x) {
+    if (this.state == x) return;
+    this.state = x;
+    this.render();
+  };
+  function _circle(x, y, r, f) {
+    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    svg.setAttribute('cx', x);
+    svg.setAttribute('cy', y);
+    svg.setAttribute('r', r);
+    svg.setAttribute('stroke', 'currentColor');
+    svg.setAttribute('fill', f);
+    svg.setAttribute('vector-effect', 'non-scaling-stroke');
+    svg.setAttribute('stroke-width', '1px');
+    return svg;
+  }
+  function _path(d) {
+    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    svg.setAttribute('d', d);
+    svg.setAttribute('fill', 'currentColor');
+    svg.setAttribute('stroke', 'currentColor');
+    svg.setAttribute('vector-effect', 'non-scaling-stroke');
+    svg.setAttribute('stroke-width', '1px');
+    return svg;
+  }
   function _moon(x) {
     return ['M', x.x, x.y - x.r, 'A', x.r, x.r, 0, 0, 1, x.x, x.y + x.r, 'L', x.x, x.y - x.r].join(' ');
   }
@@ -98,7 +126,7 @@
     self.blow = [];
     if (arg.blow) for (i = 0; i < arg.blow.length; i++) {
       x = arg.blow[i];
-      self.blow.push(new Hole(x[0], x[1], x[2]));
+      self.blow.push(new Blow(x[0], x[1], x[2]));
     }
     self.chart = [];
     for (i = 0; i < arg.chart.length; i++) {
@@ -145,7 +173,14 @@
     self.chan = arg.chan || 0;
     self._receive = function(msg) {
       if (msg.getChannel() == self.chan) {
-        if (msg.isNoteOn()) self.set(msg.getNote());
+        if (msg.isNoteOn()) {
+          self.note = msg.getNote();
+          self.set(self.note);
+          self.on();
+        }
+        else if (msg.isNoteOff()) {
+          if (self.note == msg.getNote()) self.off();
+        }
       }
       self._emit(msg);
     };
